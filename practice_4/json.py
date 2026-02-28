@@ -1,7 +1,5 @@
 import json
 
-print("=== JSON Examples ===")
-
 # Example 1: Python → JSON
 data = {"name": "Alex", "age": 17, "is_student": True}
 json_string = json.dumps(data)
