@@ -19,5 +19,5 @@ print(y)
 
 y = re.findall('^F.+?:', x)
 
-x = "From stephen@uct.ac.za Sat Jan 5"
+
 
