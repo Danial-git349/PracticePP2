@@ -6,6 +6,10 @@ with open("example.txt", "a") as f:
 with open("example.txt") as f:
   print(f.read())
 
+f = open("file.txt", "w")
+f.write("Hello world")
+f.close()
+
 #2 Open the file "demofile.txt" and overwrite the content
 with open("example.txt", "w") as f:
   f.write("Woops! I have deleted the content!")
