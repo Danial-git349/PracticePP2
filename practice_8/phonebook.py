@@ -1,5 +1,5 @@
 import psycopg2
-from config import load_config
+from practice_7.config import load_config
 def manage_phonebook():
     config = load_config()
     try:
