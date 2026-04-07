@@ -1,7 +1,7 @@
 import psycopg2
-from practice_7.config import db_params
+from config import DB_CONFIG
 
 def get_connection():
-    conn = psycopg2.connect(**db_params)
+    conn = psycopg2.connect(**DB_CONFIG)
     conn.autocommit = True
     return conn

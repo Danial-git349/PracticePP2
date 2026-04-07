@@ -1,5 +1,5 @@
 import csv
-from practice_7.connect import get_connection
+from connect import get_connection
 
 conn = get_connection()
 cur = conn.cursor()
@@ -85,5 +85,5 @@ def main_menu():
         elif choice == "5": delete_user()
         elif choice == "0": break
 
-if name == "main":
-    main_menu()
+if __name__ == "__main__":
+    main_menu() 
