@@ -1,5 +1,5 @@
 import csv
-from connect import get_connection
+from practice_7.connect import get_connection
 
 conn = get_connection()
 cur = conn.cursor()
