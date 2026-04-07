@@ -1,177 +1,89 @@
 import csv
-from connect import get_connection
+from practice_7.connect import get_connection
 
+conn = get_connection()
+cur = conn.cursor()
 
-# CREATE TABLE
 def create_table():
-    conn = get_connection()
-    cur = conn.cursor()
-
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS contacts (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100),
-        phone VARCHAR(20)
-    );
+        CREATE TABLE IF NOT EXISTS phonebook (
+            id SERIAL PRIMARY KEY,
+            first_name TEXT,
+            phone TEXT
+        )
     """)
 
-    conn.commit()
-    cur.close()
-    conn.close()
+def add_from_console():
+    name = input("Name: ")
+    phone = input("Phone: ")
+    cur.execute("INSERT INTO phonebook (first_name, phone) VALUES (%s, %s)", (name, phone))
+    print("Contact added.")
 
-
-# INSERT FROM CSV
-def insert_from_csv():
-    conn = get_connection()
-    cur = conn.cursor()
-
-    with open("contacts.csv", "r") as f:
-        reader = csv.DictReader(f)
+def add_from_csv():
+    filename = input("CSV filename: ")
+    with open(filename, "r", encoding="utf-8") as file:
+        reader = csv.reader(file)
+        next(reader)
         for row in reader:
-            cur.execute(
-                "INSERT INTO contacts (name, phone) VALUES (%s, %s)",
-                (row["name"], row["phone"])
-            )
+            cur.execute("INSERT INTO phonebook (first_name, phone) VALUES (%s, %s)", (row[0], row[1]))
+    print("Contacts from CSV added.")
 
-    conn.commit()
-    cur.close()
-    conn.close()
-    print("CSV data inserted")
-
-
-# INSERT FROM CONSOLE
-def insert_manual():
-    name = input("Enter name: ")
-    phone = input("Enter phone: ")
-
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute(
-        "INSERT INTO contacts (name, phone) VALUES (%s, %s)",
-        (name, phone)
-    )
-
-    conn.commit()
-    cur.close()
-    conn.close()
-    print("Contact added")
-
-
-# QUERY WITH FILTERS
-def query_contacts():
-    print("\n1. Show all")
-    print("2. Search by name")
-    print("3. Search by phone prefix")
-
-    choice = input("Choose: ")
-
-    conn = get_connection()
-    cur = conn.cursor()
-
+def get_users():
+    print("1. All | 2. By name | 3. By number")
+    choice = input("Choice: ")
+    
     if choice == "1":
-        cur.execute("SELECT * FROM contacts")
-
+        cur.execute("SELECT * FROM phonebook ORDER BY id ASC")
     elif choice == "2":
-        name = input("Enter name: ")
-        cur.execute(
-            "SELECT * FROM contacts WHERE name ILIKE %s",
-            (f"%{name}%",)
-        )
-
+        name = input("Name: ")
+        cur.execute("SELECT * FROM phonebook WHERE first_name ILIKE %s", ('%' + name + '%',))
     elif choice == "3":
-        prefix = input("Enter phone prefix: ")
-        cur.execute(
-            "SELECT * FROM contacts WHERE phone LIKE %s",
-            (f"{prefix}%",)
-        )
+        phone = input("Number: ")
+        cur.execute("SELECT * FROM phonebook WHERE phone LIKE %s", (phone + '%',))
+        
+    for row in cur.fetchall():
+        print(f"ID: {row[0]} | Name: {row[1]} | Phone: {row[2]}")
 
-    rows = cur.fetchall()
-    for row in rows:
-        print(row)
-
-    cur.close()
-    conn.close()
-
-
-# UPDATE CONTACT
-def update_contact():
-    name = input("Enter current name: ")
-
-    print("1. Update name")
-    print("2. Update phone")
-
-    choice = input("Choose: ")
-
-    conn = get_connection()
-    cur = conn.cursor()
-
+def update_user():
+    print("1. Update name | 2. Update phone")
+    choice = input("Choice: ")
+    
     if choice == "1":
-        new_name = input("Enter new name: ")
-        cur.execute(
-            "UPDATE contacts SET name = %s WHERE name = %s",
-            (new_name, name)
-        )
-
+        old_name = input("Name to update: ")
+        new_name = input("New name: ")
+        cur.execute("UPDATE phonebook SET first_name = %s WHERE first_name = %s", (new_name, old_name))
     elif choice == "2":
-        new_phone = input("Enter new phone: ")
-        cur.execute(
-            "UPDATE contacts SET phone = %s WHERE name = %s",
-            (new_phone, name)
-        )
+        name = input("Name to update: ")
+        new_phone = input("New number: ")
+        cur.execute("UPDATE phonebook SET phone = %s WHERE first_name = %s", (new_phone, name))
+    
+    print("Updated.")
 
-    conn.commit()
-    cur.close()
-    conn.close()
-    print("Updated successfully")
+def delete_user():
+    print("1. By name | 2. By number")
+    choice = input("Choice: ")
+    
+    if choice == "1":
+        name = input("Name to delete: ")
+        cur.execute("DELETE FROM phonebook WHERE first_name = %s", (name,))
+    elif choice == "2":
+        phone = input("Number to delete: ")
+        cur.execute("DELETE FROM phonebook WHERE phone = %s", (phone,))
+        
+    print("Deleted.")
 
-
-# DELETE CONTACT
-def delete_contact():
-    value = input("Enter name OR phone to delete: ")
-
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute(
-        "DELETE FROM contacts WHERE name = %s OR phone = %s",
-        (value, value)
-    )
-
-    conn.commit()
-    cur.close()
-    conn.close()
-    print("Deleted successfully")
-
-
-# MAIN MENU
-def main():
+def main_menu():
     create_table()
-
     while True:
-        print("\n--- PHONEBOOK MENU ---")
-        print("1. Insert from CSV")
-        print("2. Insert manually")
-        print("3. Query contacts")
-        print("4. Update contact")
-        print("5. Delete contact")
-        print("6. Exit")
+        print("\n1.Add | 2.CSV | 3.Search | 4.Update | 5.Delete | 0.Exit")
+        choice = input("Choice: ")
+        
+        if choice == "1": add_from_console()
+        elif choice == "2": add_from_csv()
+        elif choice == "3": get_users()
+        elif choice == "4": update_user()
+        elif choice == "5": delete_user()
+        elif choice == "0": break
 
-        choice = input("Choose: ")
-
-        if choice == "1":
-            insert_from_csv()
-        elif choice == "2":
-            insert_manual()
-        elif choice == "3":
-            query_contacts()
-        elif choice == "4":
-            update_contact()
-        elif choice == "5":
-            delete_contact()
-        elif choice == "6":
-            break
-
-
-if __name__ == "__main__":
-    main()
+if name == "main":
+    main_menu()
