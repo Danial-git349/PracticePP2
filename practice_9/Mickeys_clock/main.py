@@ -16,13 +16,14 @@ def trim_image(image):
     return cropped
 sec_hand = pygame.image.load("practice_9/Mickeys_clock/images/left_hand.png").convert_alpha()
 min_hand = pygame.image.load("practice_9/Mickeys_clock/images/right_hand.png").convert_alpha()
-
+clock_1 = pygame.image.load("practice_9/Mickeys_clock/images/mainclock.png").convert_alpha()
 # OPTIONAL: fix rotation if needed
 # hand_img = pygame.transform.rotate(hand_img, 90)
 
 # Resize (optional)
 sec_hand = pygame.transform.scale(sec_hand, (120, 120))
 min_hand = pygame.transform.scale(min_hand, (120, 120))
+clock_1 = pygame.transform.scale(clock_1, (WIDTH, HEIGHT))
 
 center = (WIDTH // 2, HEIGHT // 2)
 
@@ -43,7 +44,7 @@ while running:
 
     # 🧠 Get angles from clock.py
     sec_angle, min_angle = get_angles()
-
+    screen.blit(clock_1, (0, 0))
     # 🖐 Draw hands
     draw_hand(sec_hand, sec_angle, center)   # left hand = seconds
     draw_hand(min_hand, min_angle, center)   # right hand = minutes   
