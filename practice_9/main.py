@@ -1,6 +1,6 @@
 import pygame
 import sys
-from clock import get_angles
+from practice_9.clock import get_angles
 
 pygame.init()
 
